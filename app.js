@@ -255,6 +255,7 @@ function listenForAnswer() {
   let finished = false;
   let fullTranscript = "";
   let safetyTimer = null;
+  let restartCount = 0;
 
   listeningIndicator.classList.remove("hidden");
   doneListeningBtn.classList.remove("hidden");
@@ -337,6 +338,8 @@ function listenForAnswer() {
     recognition.onerror = (event) => {
       if (finished || matched) return;
       if (event.error === "no-speech") {
+        restartCount++;
+        if (!fullTranscript) liveTranscript.textContent = `(아직 소리를 못 들었어요 - ${restartCount}번째 재시도)`;
         startSession(); // 잠깐 조용했던 것뿐이니 완료 버튼 누르기 전까지 계속 듣기
         return;
       }
@@ -358,6 +361,8 @@ function listenForAnswer() {
     recognition.onend = () => {
       // 한 문장이 침묵으로 자연스럽게 끝난 것 -> 완료 버튼을 아직 안 눌렀으면 이어서 계속 듣기
       if (finished || matched) return;
+      restartCount++;
+      if (!fullTranscript) liveTranscript.textContent = `(아직 소리를 못 들었어요 - ${restartCount}번째 재시도)`;
       startSession();
     };
 

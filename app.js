@@ -39,9 +39,15 @@ if (!speechSupported) {
 let currentAudioEl = null;
 let currentAudioResolve = null;
 
-function playAudio(src) {
+// 다음에 재생할 파일을 미리 내려받아두기만 함 (재생은 아직 안 함)
+function preloadAudio(src) {
+  const audio = new Audio(src);
+  audio.preload = "auto";
+  return audio;
+}
+
+function playPreloaded(audio) {
   return new Promise((resolve) => {
-    const audio = new Audio(src);
     currentAudioEl = audio;
     currentAudioResolve = resolve;
     const finish = () => {
@@ -55,6 +61,23 @@ function playAudio(src) {
     audio.onerror = finish;
     audio.play().catch(finish);
   });
+}
+
+function playAudio(src) {
+  return playPreloaded(preloadAudio(src));
+}
+
+// 여러 파일을 이어서 틀 때, 지금 파일이 재생되는 동안 다음 파일을 미리 받아둬서
+// 파일 사이에 로딩 때문에 뜸 들이는 걸 줄임
+async function playSequence(urls, shouldAbort) {
+  if (!urls.length) return;
+  let nextAudio = preloadAudio(urls[0]);
+  for (let i = 0; i < urls.length; i++) {
+    if (shouldAbort && shouldAbort()) return;
+    const audio = nextAudio;
+    nextAudio = i + 1 < urls.length ? preloadAudio(urls[i + 1]) : null;
+    await playPreloaded(audio);
+  }
 }
 
 // 건너뛰기 등으로 재생 중인 오디오를 즉시 멈추고, 기다리고 있던 await도 바로 풀어줌
@@ -177,18 +200,13 @@ function loadCurrentAnimal() {
 
 async function playHintAudio(token, isFirst) {
   const animal = currentAnimal();
+  const abort = () => token !== quizToken;
   if (isFirst) {
     statusText.textContent = "잘 듣고 저를 맞혀보세요!";
-    await playAudio("audio/shared-intro.mp3");
-    if (token !== quizToken) return;
-    await playAudio(`audio/${animal.id}-hint1.mp3`);
-    if (token !== quizToken) return;
-    await playAudio(`audio/${animal.id}-hint2.mp3`);
+    await playSequence(["audio/shared-intro.mp3", `audio/${animal.id}-hint1.mp3`, `audio/${animal.id}-hint2.mp3`], abort);
   } else {
     statusText.textContent = "힌트를 하나 더 들려줄게요!";
-    await playAudio("audio/shared-more-hint.mp3");
-    if (token !== quizToken) return;
-    await playAudio(`audio/${animal.id}-hint3.mp3`);
+    await playSequence(["audio/shared-more-hint.mp3", `audio/${animal.id}-hint3.mp3`], abort);
   }
 }
 

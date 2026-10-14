@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<meta name="description" content="4~5세 아이를 위한 동물 소리 힌트 퀴즈. 호랑이부터 공룡까지, 듣고 맞혀보세요!">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦁</text></svg>">
 <title>동물퀴즈</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Freesentation/paperlogy@main/Paperlogy.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +14,9 @@
   <!-- 시작 화면 -->
   <section id="frontScreen" class="screen">
     <div class="card front-card">
-      <div class="mascot">🐯🦕🐬🦋</div>
+      <div class="mascot">
+        <span>🐯</span><span>🦕</span><span>🐬</span><span>🦋</span>
+      </div>
       <h1>동물퀴즈</h1>
       <p class="subtitle">힌트를 듣고 어떤 동물인지 맞혀보세요!</p>
       <button id="startBtn" class="big-btn primary">🎯 퀴즈 시작하기</button>
@@ -58,7 +63,9 @@
   <!-- 완료 화면 -->
   <section id="doneScreen" class="screen hidden">
     <div class="card front-card">
-      <div class="mascot">🎉🏆🎉</div>
+      <div class="mascot">
+        <span>🎉</span><span>🏆</span><span>🎉</span>
+      </div>
       <h1>다 풀었어요!</h1>
       <p class="subtitle"><span id="doneCount">150</span>개 동물퀴즈를 모두 완료했어요. 최고예요!</p>
       <button id="restartBtn" class="big-btn primary">🔄 다시 시작하기</button>

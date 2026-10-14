@@ -14,6 +14,7 @@ const animalEmoji = document.getElementById("animalEmoji");
 const statusText = document.getElementById("statusText");
 const feedbackText = document.getElementById("feedbackText");
 const listeningIndicator = document.getElementById("listeningIndicator");
+const liveTranscript = document.getElementById("liveTranscript");
 
 const playBtn = document.getElementById("playBtn");
 const doneListeningBtn = document.getElementById("doneListeningBtn");
@@ -264,6 +265,7 @@ function listenForAnswer() {
   function cleanup() {
     clearTimeout(safetyTimer);
     listeningIndicator.classList.add("hidden");
+    liveTranscript.textContent = "";
     doneListeningBtn.classList.add("hidden");
     replayHintBtn.classList.add("hidden");
     if (manualFinishListening === finalize) manualFinishListening = null;
@@ -321,6 +323,7 @@ function listenForAnswer() {
       }
       // 이번 세션에서 들은 말을 이전까지 들은 것과 합쳐서, 끊겨도 여러 후보를 계속 판정
       fullTranscript = (fullTranscript + " " + combined).trim();
+      liveTranscript.textContent = fullTranscript ? `"${fullTranscript}"` : "";
 
       if (!matched && isCorrectAnswer(fullTranscript, animal)) {
         matched = true;
@@ -342,8 +345,12 @@ function listenForAnswer() {
       cleanup();
       if (event.error === "not-allowed" || event.error === "service-not-allowed") {
         statusText.textContent = "마이크 사용을 허락해주셔야 들을 수 있어요.";
+      } else if (event.error === "network") {
+        statusText.textContent = "인터넷 연결이 필요해요. (음성인식 오류: network)";
+      } else if (event.error === "audio-capture") {
+        statusText.textContent = "마이크를 찾을 수 없어요. (음성인식 오류: audio-capture)";
       } else {
-        statusText.textContent = "잘 못 들었어요. 다시 말해줄래요?";
+        statusText.textContent = `잘 못 들었어요. 다시 말해줄래요? (오류: ${event.error})`;
       }
       retryListenBtn.classList.remove("hidden");
     };
